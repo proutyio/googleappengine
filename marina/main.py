@@ -65,13 +65,6 @@ class BoatHandler(webapp2.RequestHandler):
 				self.response.write("\n"+json.dumps(b_d)+"\n")		
 
 
-
-
-	# def find_empty_slip():
-	# 	slips = Slip.query()
-	# 	for s in slips:
-	# 		s.
-
 	def put(self, id=None):
 		if not id:
 			self.response.set_status(400)
@@ -111,44 +104,69 @@ class BoatHandler(webapp2.RequestHandler):
 
 	
 	def set_arrival(self, id):
-		try:
+		#try:
 			b_key = ndb.Key(urlsafe=id)
 			boat = b_key.get()
-			if self.set_arrival(id):
-				boat.atsea = False
-				boat.put()
-				self.response.write("Boat arrived at an open slip")
+			if boat.atsea:
+				if self.add_to_slip(id):
+					boat.atsea = False
+					boat.put()
+					self.response.set_status(201)
+					self.response.write("Boat arrived at an open slip")
+				else:
+					self.response.set_status(403)
+					self.response.write("All slips occupied. Can't arrive boat")
 			else:
 				self.response.set_status(403)
-				self.response.write("All slips occupied. Can't arrive boat")
-		except:
-			self.response.set_status(400)
-			self.response.write("ID does not exsist")
+				self.response.write("Boat already in a slip")
+		#except:
+		#	self.response.set_status(400)
+			#lf.response.write("ID does not exsist")
 		# need to add to slip now or give error if already in slip
 
 
 	def remove_from_slip(self, id):
 		slips = Slip.query()
+		self.response.write(id)
 		for s in slips:
 			if(s.current_boat == id):
-				self.response.write(s)
+				s.current_boat = None
+				#log date
+				s.put()
+				return 
 
 
-	def add_to_slip(id):
+	def add_to_slip(self, id):
 		slips = Slip.query()
 		for s in slips:
-			if(s.current_boat == None)
-				s.current_boat = id
+			if(s.current_boat == None):
+				#log data
+				s.current_boat = self.route+id
+				s.put()
 				return True
-			else:
-				return False
+		return False
 
 
 
 	
 
-	def delete(self):
-		pass
+	def delete(self, id=None):
+		if not id:
+			self.response.set_status(400)
+			self.response.write("Missing ID")
+			return
+		
+		try:
+			b_key = ndb.Key(urlsafe=id)
+			boat = b_key.get()
+			boat.key.delete()
+			self.remove_from_slip(id)
+			self.response.set_status(203)
+			self.response.write("Boat deleted")
+		except:
+			self.response.set_status(400)
+			self.response.write("ID does not exsist")
+
 
 
 
@@ -184,7 +202,29 @@ class SlipHandler(webapp2.RequestHandler):
 			for s in Slip.query():
 				s_d = s.to_dict()
 				s_d['id'] = self.route+s.key.urlsafe() 
-				self.response.write("\n"+str(s_d))	
+				self.response.write("\n"+str(s_d)+"\n")	
+
+
+	def delete(self, id=None):
+		if not id:
+			self.response.set_status(400)
+			self.response.write("Missing ID")
+			return
+		try:
+			s_key = ndb.Key(urlsafe=id)
+			slip = s_key.get()
+			slip.key.delete()
+			
+			self.remove_boat_from_slip(id)
+			self.response.set_status(203)
+			self.response.write("Slip deleted")
+		except:
+			self.response.set_status(400)
+			self.response.write("ID does not exsist")
+
+
+		def remove_boat_from_slip(self, id):
+			pass
 
 
 
