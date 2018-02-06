@@ -37,11 +37,12 @@ class BoatHandler(webapp2.RequestHandler):
 		return b_dict
 
 
+
 	def post(self):
 		try:
 			boat = self.create()
 			self.response.set_status(201)
-			self.response.write(boat)
+			self.response.write(json.dumps(boat))
 		except:
 			self.response.set_status(400)
 			self.response.write("Failed to add boat")
@@ -57,12 +58,13 @@ class BoatHandler(webapp2.RequestHandler):
 				self.response.write(json.dumps(b_dict))
 			except:
 				self.response.set_status(400)
-				self.response.write("ID does not exsist")
+				self.response.write("ID does not exist")
 		else:
 			for b in Boat.query():
 				b_d = b.to_dict()
 				b_d['id'] = self.route+b.key.urlsafe() 
-				self.response.write("\n"+json.dumps(b_d)+"\n")		
+				self.response.write(json.dumps(b_d))		
+
 
 
 	def put(self, id=None):
@@ -96,22 +98,21 @@ class BoatHandler(webapp2.RequestHandler):
 				boat.put()
 				self.remove_from_slip(id)
 				self.response.write("Boat removed from slip and set at_sea")
-				 #need to remove from slip or give error is already at sea
 		except:
 			self.response.set_status(400)
-			self.response.write("ID does not exsist")
+			self.response.write("ID does not exist")
 
 
 	
 	def set_arrival(self, id):
-		#try:
+		try:
 			b_key = ndb.Key(urlsafe=id)
 			boat = b_key.get()
 			if boat.atsea:
 				if self.add_to_slip(id):
 					boat.atsea = False
 					boat.put()
-					self.response.set_status(201)
+					self.response.set_status(200)
 					self.response.write("Boat arrived at an open slip")
 				else:
 					self.response.set_status(403)
@@ -119,36 +120,32 @@ class BoatHandler(webapp2.RequestHandler):
 			else:
 				self.response.set_status(403)
 				self.response.write("Boat already in a slip")
-		#except:
-		#	self.response.set_status(400)
-			#lf.response.write("ID does not exsist")
-		# need to add to slip now or give error if already in slip
+		except:
+			self.response.set_status(400)
+			self.response.write("ID does not exsist")
+
 
 
 	def remove_from_slip(self, id):
 		slips = Slip.query()
-		self.response.write(id)
 		for s in slips:
-			if(s.current_boat == id):
+			if(s.current_boat == self.route+id):
 				s.current_boat = None
-				#log date
 				s.put()
 				return 
+
 
 
 	def add_to_slip(self, id):
 		slips = Slip.query()
 		for s in slips:
 			if(s.current_boat == None):
-				#log data
 				s.current_boat = self.route+id
 				s.put()
 				return True
 		return False
 
 
-
-	
 
 	def delete(self, id=None):
 		if not id:
@@ -165,7 +162,51 @@ class BoatHandler(webapp2.RequestHandler):
 			self.response.write("Boat deleted")
 		except:
 			self.response.set_status(400)
-			self.response.write("ID does not exsist")
+			self.response.write("ID does not exist")
+
+
+	def patch(self, id=None):
+		if not id:
+			self.response.set_status(400)
+			self.response.write("Missing ID")
+			return
+
+		try:
+			data = json.loads(self.request.body)
+			try:
+				b_key = ndb.Key(urlsafe=id)
+				boat = b_key.get()
+				try:
+					if data['name']:
+						boat.name = data['name']
+						boat.put()
+				except: pass
+				try:
+					if data['type']:
+						boat.b_type = data['type']
+						boat.put()
+				except: pass
+				try:
+					if data['length']:
+						boat.length = data['length']
+						boat.put()
+				except:
+					self.response.set_status(400)
+					self.response.write("Length must be an integer")
+					return
+				
+				boat = ndb.Key(urlsafe=id).get()
+				b_dict = boat.to_dict()
+				b_dict['id'] = self.route+id
+				self.response.set_status(202)
+				self.response.write(json.dumps(b_dict))
+			except:
+				self.response.set_status(400)
+				self.response.write("ID does not exist")
+		except:
+			self.response.set_status(400)
+			self.response.write("Missing raw json")
+
 
 
 
@@ -183,13 +224,18 @@ class SlipHandler(webapp2.RequestHandler):
 					)
 		slip.put()
 		s_dict = slip.to_dict()
-		s_dict['id'] = self.route+slip.key.urlsafe()
+		s_dict['id'] = slip.key.urlsafe()
 		return s_dict
 
 
 	def post(self):
-		slip = self.create()
-		self.response.write(json.dumps(slip))
+		try:
+			slip = self.create()
+			self.response.set_status(201)
+			self.response.write(json.dumps(slip))
+		except:
+			self.response.set_status(400)
+			self.response.write("Failed to add slip")
 
 
 	def get(self, id=None):
@@ -197,12 +243,12 @@ class SlipHandler(webapp2.RequestHandler):
 			slip = ndb.Key(urlsafe=id).get()
 			s_dict = slip.to_dict()
 			s_dict['id'] = id
-			self.response.write(s_dict)
+			self.response.write(json.dumps(s_dict))
 		else:
 			for s in Slip.query():
 				s_d = s.to_dict()
 				s_d['id'] = self.route+s.key.urlsafe() 
-				self.response.write("\n"+str(s_d)+"\n")	
+				self.response.write(json.dumps(str(s_d)))	
 
 
 	def delete(self, id=None):
@@ -214,8 +260,9 @@ class SlipHandler(webapp2.RequestHandler):
 			s_key = ndb.Key(urlsafe=id)
 			slip = s_key.get()
 			slip.key.delete()
-			
-			self.remove_boat_from_slip(id)
+			if not (slip.current_boat == None):
+				boat_id = slip.current_boat
+				self.remove_boat_from_slip(boat_id.split("/")[3])
 			self.response.set_status(203)
 			self.response.write("Slip deleted")
 		except:
@@ -223,9 +270,11 @@ class SlipHandler(webapp2.RequestHandler):
 			self.response.write("ID does not exsist")
 
 
-		def remove_boat_from_slip(self, id):
-			pass
-
+	def remove_boat_from_slip(self, id):
+		b_key = ndb.Key(urlsafe=id)
+		boat = b_key.get()
+		boat.atsea = True
+		boat.put()
 
 
 
@@ -253,40 +302,3 @@ app = webapp2.WSGIApplication([
 ], debug=True)
 
 
-
-
-
-
-# class Fish(ndb.Model):
-#     name = ndb.StringProperty(required=True)
-#     ph_min = ndb.IntegerProperty()
-
-
-
-
-# class FishHandler(webapp2.RequestHandler):
-# 	def post(self):
-# 		parent_key = ndb.Key(Fish, "parent_fish")
-
-
-# 		fish_data = json.loads(self.request.body)
-# 		#self.response.write(json.dumps(fish_data)) #check data
-
-# 		#make a fish
-# 		new_fish = Fish(name=fish_data['name'], parent=parent_key)
-# 		new_fish.put()
-
-# 		# add key to fish
-# 		fish_dict = new_fish.to_dict()
-# 		fish_dict['self'] = '/fish/' + new_fish.key.urlsafe()
-		
-# 		self.response.write(json.dumps(fish_dict)) #check data
-
-
-
-# 	def get(self, id=None):
-# 		if id:
-# 			fish = ndb.Key(urlsafe=id).get()
-# 			fish_dict = fish.to_dict()
-# 			fish_dict['self'] = '/fish/' + id
-# 			self.response.write(json.dumps(fish_dict))
