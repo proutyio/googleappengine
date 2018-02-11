@@ -1,0 +1,76 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/4.0.0-beta.3/united/bootstrap.min.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+	</head>
+
+	<body>
+		<div class="col-md-2"></div>
+		<div class="col-md-8">
+			<div class="page-header">
+				<h1>Mobile and Cloud Software Development <small>OAuth 2.0 Implementation</small></h1>
+			</div>
+			<p></p>
+			<div class="list-group">
+				<a class="list-group-item active">
+					<h2 class="list-group-item-heading">Success!</h2>
+					<h4 class="list-group-item-text">Logged In</h4>
+				</a>
+			</div>
+			<p></p>
+			<div class="panel panel-default">
+				<div class="panel-heading"><h1>Kind:</h1></div>
+				<div class="text-center">
+					<div class="panel-body"><h3>{{user_data.kind}}</h3></div>
+				</div>
+			</div>
+			<p></p>
+			<div class="panel panel-default">
+				<div class="panel-heading"><h1>URL:</h1></div>
+				<div class="text-center">
+					<div class="panel-body"><h3>{{user_data.url}}</h3></div>
+				</div>
+			</div>
+			<p></p>
+			<div class="panel panel-default">
+				<div class="panel-heading"><h1>ID:</h1></div>
+				<div class="text-center">
+					<div class="panel-body"><h3>{{user_data.id}}</h3></div>
+				</div>
+			</div>
+			<p></p>
+			<div class="panel panel-default">
+				<div class="panel-heading"><h1>Email:</h1></div>
+				<div class="text-center">
+					<div class="panel-body"><h3>{{user_data.emails[0].value}}</h3></div>
+				</div>
+			</div>
+			<p></p>
+			<div class="panel panel-default">
+				<div class="panel-heading"><h1>Name:</h1></div>
+				<div class="text-center">
+					<div class="panel-body"><h3>{{user_data.name.givenName}} {{user_data.name.familyName}}</h3></div>
+				</div>
+			</div>
+			<p></p>
+			<div class="panel panel-default">
+				<div class="panel-heading"><h1>Nickname:</h1></div>
+				<div class="text-center">
+					<div class="panel-body"><h3>{{user_data.nickname}}</h3></div>
+				</div>
+			</div>
+			<p></p>
+			<div class="panel panel-default">
+				<div class="panel-heading"><h1>Domain:</h1></div>
+				<div class="text-center">
+					<div class="panel-body"><h3>{{user_data.domain}}</h3></div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-2"></div>
+	</body>
+</html>

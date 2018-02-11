@@ -39,7 +39,8 @@ def callback():
 	post_result = post_return_token(code)
 	user_data = get_user_data(post_result['access_token'])
 	print(user_data, file=sys.stderr)
-	return user_data
+	#return str(user_data)
+	return render_template('userpage.html', user_data=user_data)
 
 
 
