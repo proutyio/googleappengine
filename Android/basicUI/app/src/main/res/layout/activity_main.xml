@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.android.r00t.basicui.MainActivity">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="45dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="serif-monospace"
+        android:text="Welcome"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:typeface="monospace" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="29dp"
+        android:text="  Select an option:" />
+
+    <Button
+        android:id="@+id/gview"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:text="Grid Layout"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/hview"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:text=" Linear Layout(horizontal)"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/vview"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:text=" Linear Layout(vertical)"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/rview"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:text="Relative Layout"
+        android:textAllCaps="false" />
+
+</LinearLayout>

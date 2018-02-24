@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">basicUI</string>
+    <string name="title_activity_grid_view">GridViewActivity</string>
+    <string name="title_activity_horizontal_view">HorizontalViewActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+</resources>
