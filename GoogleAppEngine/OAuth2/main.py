@@ -46,9 +46,9 @@ def random_state():
 def callback():
 	state = request.args['state']
 	code = request.args['code']
-	post_result = post_return_token(code)
+	post_result = post_return_token(code)	
 	user_data = get_user_data(post_result['access_token'])
-	return render_template('userpage.html', user_data=user_data, state=state)
+	return render_template('userpage.html', user_data=user_data, state=state, token=post_result['access_token'])
 
 
 
